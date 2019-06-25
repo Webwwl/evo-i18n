@@ -1,0 +1,30 @@
+{
+  "name": "evo-i18n",
+  "version": "1.0.1",
+  "description": "evo-i18n",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "evo-i18n": "./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Webwwl/evo-i18n.git"
+  },
+  "keywords": [
+    "i18n",
+    "evo"
+  ],
+  "author": "wwl",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Webwwl/evo-i18n/issues"
+  },
+  "homepage": "https://github.com/Webwwl/evo-i18n#readme",
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "shelljs": "^0.8.3"
+  }
+}
