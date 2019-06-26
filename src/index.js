@@ -22,7 +22,11 @@ let source = fs.readFileSync('./i18n.csv', {
 
 if(source.includes('#')) currentLine++
 
-source = source.split('\n').filter(line => !line.includes('#'))
+if (isWin()) {
+  source = source.split('\r\n').filter(line => !line.includes('#'))
+} else {
+  source = source.split('\n').filter(line => !line.includes('#'))
+}
 source.forEach((line, index) => {
   parseLine(line, index+1)
 })
@@ -82,12 +86,7 @@ function checkLine(str, line) {
 
 function formatResObj(obj) {
   obj = JSON.stringify(obj)
-  let objStr = ''
-  if (isWin()) {
-    objStr =  obj.replace(/","/g, '",\n  "').replace(/^{/, '{\n  ').replace(/}$/, '  \n}').replace(/\\\\/g, '\\')
-  } else {
-    objStr =  obj.replace(/","/g, '",\r\n  "').replace(/^{/, '{\r\n  ').replace(/}$/, '  \r\n}').replace(/\\\\/g, '\\')
-  }
+  const objStr = obj.replace(/","/g, '",\n  "').replace(/^{/, '{\n  ').replace(/}$/, '  \n}').replace(/\\\\/g, '\\')
   return objStr
 }
 
@@ -109,5 +108,5 @@ function parseStrWithComma(str, line) {
 }
 
 function isWin() {
-  return  /win\d{2,}/.test(process.platform.toLocaleLowerCase())
+  return  /^win\d{2,}$/.test(process.platform.toLocaleLowerCase())
 }
