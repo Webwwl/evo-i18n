@@ -15,7 +15,8 @@ let currentLine = 0
 
 console.log('start')
 
-let source = fs.readFileSync(path.join(__dirname, './i18n.csv'), {
+console.log('path:', path.join(__dirname, './i18n.csv'))
+let source = fs.readFileSync('./i18n.csv', {
   encoding: 'utf-8'
 })
 
@@ -53,7 +54,7 @@ function parseLine(str, line) {
       break;
     }
     case 3: {
-      const res = parseStrWithComma(str)
+      const res = parseStrWithComma(str, line)
       let [key, zh, en] = res
       enObj[key] = en
       zhObj[key] = zh
@@ -70,7 +71,7 @@ function checkLine(str, line) {
     return 2
   }
   // 包含"line
-  if(/["]/.test(str)) return 3
+  if(/["'],["']/.test(str)) return 3
   const length = str.split(',').length
   if (length !== CONFIG.LENGHT) {
     console.log(chalk.yellow(`line ${currentLine} format error, lenght = ${length}`))
@@ -81,32 +82,32 @@ function checkLine(str, line) {
 
 function formatResObj(obj) {
   obj = JSON.stringify(obj)
-  const objStr =  obj.replace(/","/g, '",\n  "').replace(/^{/, '{\n  ').replace(/}$/, '  \n}').replace(/\\\\/g, '\\')
+  let objStr = ''
+  if (isWin()) {
+    objStr =  obj.replace(/","/g, '",\n  "').replace(/^{/, '{\n  ').replace(/}$/, '  \n}').replace(/\\\\/g, '\\')
+  } else {
+    objStr =  obj.replace(/","/g, '",\r\n  "').replace(/^{/, '{\r\n  ').replace(/}$/, '  \r\n}').replace(/\\\\/g, '\\')
+  }
   return objStr
 }
 
-// "xx,xx"这种
-function parseStrWithComma(str) {
-  const res = []
-  const key = str.split(',')[0]
-  res.push(key)
-  str = str.slice(key.length + 1)
-  // str = str.slice(1, str.length - 1)
-  let startIndex = 0;
-  let currentIndex = 0;
-  while(currentIndex < str.length && currentIndex !== -1) {
-    let start = 0;
-    let end = 0;
-    currentIndex = str.indexOf('"', currentIndex)
-    if (currentIndex !== -1) {
-      start = currentIndex
+function parseStrWithComma(str, line) {
+  try{
+    let tmpArr = []
+    if (str.includes('"')) {
+      tmpArr = str.split('","')
+    } else {
+      tmpArr = str.split("','")
     }
-    currentIndex = str.indexOf('"', start + 1)
-    if (currentIndex !== -1)
-    end = currentIndex
-    currentIndex++
-    let item = str.slice(start, end + 1)
-    res.push(item.slice(1, item.length - 1))
+    let [key, zh, en] = tmpArr
+    key = key.slice(1)
+    en = en.slice(0, en.length-1)
+    return [key, zh, en]
+  } catch(error) {
+    console.log(chalk.red('error line: str', line + ':\n' + str))
   }
-  return res
+}
+
+function isWin() {
+  return  /win\d{2,}/.test(process.platform.toLocaleLowerCase())
 }
